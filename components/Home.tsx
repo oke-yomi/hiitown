@@ -1,12 +1,18 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
 import {
-  Animated,
   ImageBackground,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import Animated, {
+  interpolate,
+  interpolateColor,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 import { Colors } from "theme/colors";
 
 import Details from "./Details";
@@ -16,32 +22,48 @@ import Header from "./Header";
 const mainTitle = "The Food Cafe";
 
 const Home = () => {
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const [showTitle, setShowTitle] = useState(false);
+  const scrollY = useSharedValue(0);
 
-  useEffect(() => {
-    const listener = scrollY.addListener(({ value }) => {
-      if (value > 250) {
-        setShowTitle(true);
-      } else {
-        setShowTitle(false);
-      }
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const headerStyle = useAnimatedStyle(() => {
+    const opacity = interpolate(scrollY.value, [0, 250], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
     });
-    return () => {
-      scrollY.removeListener(listener);
+
+    return {
+      opacity,
     };
-  }, [scrollY]);
+  });
+
+  const backgroundStyle = useAnimatedStyle(() => {
+    const backgroundColor = interpolateColor(
+      scrollY.value,
+      [0, 250],
+      ["transparent", Colors.primary],
+    );
+
+    return {
+      backgroundColor,
+    };
+  });
 
   return (
     <>
-      <Header mainTitle={mainTitle} showTitle={showTitle} />
+      <Header
+        mainTitle={mainTitle}
+        showTitleAnimatedStyle={headerStyle}
+        showBackgroundAnimatedStyle={backgroundStyle}
+      />
 
       <Animated.ScrollView
         style={{ flex: 1 }}
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: false },
-        )}
+        onScroll={scrollHandler}
         scrollEventThrottle={16}
       >
         <View style={[styles.image, { position: "relative" }]}>
@@ -57,7 +79,11 @@ const Home = () => {
         <View>
           <Details mainTitle={mainTitle} />
 
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <ScrollView
+            style={styles.categoryList}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+          >
             <>
               <View
                 style={{
@@ -154,4 +180,5 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
   },
+  categoryList: {},
 });
