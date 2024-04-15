@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   ImageBackground,
-  ScrollView,
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import Animated, {
   interpolate,
@@ -23,10 +23,35 @@ const mainTitle = "The Food Cafe";
 
 const Home = () => {
   const scrollY = useSharedValue(0);
+  const isSticky = useSharedValue(false);
+
+  const { height: screenHeight } = useWindowDimensions();
+  console.log("screenHeight", screenHeight);
+
+  const categoryListTop = useSharedValue(0);
+  const categoryListRef = useRef<View>(null);
+
+  const onCategoryListLayout = () => {
+    categoryListRef.current?.measure(
+      (_x, _y, _width, _height, _pageX, pageY) => {
+        categoryListTop.value = pageY;
+      },
+    );
+  };
+
+  const categoryListStyle = useAnimatedStyle(() => {
+    const backgroundColor = isSticky.value ? "red" : "blue";
+
+    return {
+      backgroundColor,
+    };
+  });
 
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: (event) => {
       scrollY.value = event.contentOffset.y;
+
+      isSticky.value = Math.round(categoryListTop.value - scrollY.value) <= 90;
     },
   });
 
@@ -79,84 +104,89 @@ const Home = () => {
         <View>
           <Details mainTitle={mainTitle} />
 
-          <ScrollView
-            style={styles.categoryList}
-            horizontal
-            showsHorizontalScrollIndicator={false}
+          <View
+            style={[styles.categoryList, categoryListStyle]}
+            onLayout={onCategoryListLayout}
+            ref={categoryListRef}
           >
-            <>
-              <View
-                style={{
-                  marginRight: 16,
-                  padding: 12,
-                  borderRadius: 12,
-                  backgroundColor: Colors.offWhite,
-                }}
-              >
-                <Text style={{ color: Colors.blue }}>Popular</Text>
-              </View>
-              <View
-                style={{
-                  marginRight: 16,
-                  padding: 12,
-                  borderRadius: 12,
-                  backgroundColor: Colors.offWhite,
-                }}
-              >
-                <Text style={{ color: Colors.blue }}>Combo</Text>
-              </View>
-              <View
-                style={{
-                  marginRight: 16,
-                  padding: 12,
-                  borderRadius: 12,
-                  backgroundColor: Colors.offWhite,
-                }}
-              >
-                <Text style={{ color: Colors.blue }}>Pizza</Text>
-              </View>
-              <View
-                style={{
-                  marginRight: 16,
-                  padding: 12,
-                  borderRadius: 12,
-                  backgroundColor: Colors.offWhite,
-                }}
-              >
-                <Text style={{ color: Colors.blue }}>Burger</Text>
-              </View>
-              <View
-                style={{
-                  marginRight: 16,
-                  padding: 12,
-                  borderRadius: 12,
-                  backgroundColor: Colors.offWhite,
-                }}
-              >
-                <Text style={{ color: Colors.blue }}>Cocktails</Text>
-              </View>
-              <View
-                style={{
-                  marginRight: 16,
-                  padding: 12,
-                  borderRadius: 12,
-                  backgroundColor: Colors.offWhite,
-                }}
-              >
-                <Text style={{ color: Colors.blue }}>Smoothies</Text>
-              </View>
-              <View
-                style={{
-                  marginRight: 16,
-                  padding: 12,
-                  borderRadius: 12,
-                  backgroundColor: Colors.offWhite,
-                }}
-              >
-                <Text style={{ color: Colors.blue }}>Extras</Text>
-              </View>
-            </>
-          </ScrollView>
+            <Animated.ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+            >
+              <>
+                <View
+                  style={{
+                    marginRight: 16,
+                    padding: 12,
+                    borderRadius: 12,
+                    backgroundColor: Colors.offWhite,
+                  }}
+                >
+                  <Text style={{ color: Colors.blue }}>Popular</Text>
+                </View>
+                <View
+                  style={{
+                    marginRight: 16,
+                    padding: 12,
+                    borderRadius: 12,
+                    backgroundColor: Colors.offWhite,
+                  }}
+                >
+                  <Text style={{ color: Colors.blue }}>Combo</Text>
+                </View>
+                <View
+                  style={{
+                    marginRight: 16,
+                    padding: 12,
+                    borderRadius: 12,
+                    backgroundColor: Colors.offWhite,
+                  }}
+                >
+                  <Text style={{ color: Colors.blue }}>Pizza</Text>
+                </View>
+                <View
+                  style={{
+                    marginRight: 16,
+                    padding: 12,
+                    borderRadius: 12,
+                    backgroundColor: Colors.offWhite,
+                  }}
+                >
+                  <Text style={{ color: Colors.blue }}>Burger</Text>
+                </View>
+                <View
+                  style={{
+                    marginRight: 16,
+                    padding: 12,
+                    borderRadius: 12,
+                    backgroundColor: Colors.offWhite,
+                  }}
+                >
+                  <Text style={{ color: Colors.blue }}>Cocktails</Text>
+                </View>
+                <View
+                  style={{
+                    marginRight: 16,
+                    padding: 12,
+                    borderRadius: 12,
+                    backgroundColor: Colors.offWhite,
+                  }}
+                >
+                  <Text style={{ color: Colors.blue }}>Smoothies</Text>
+                </View>
+                <View
+                  style={{
+                    marginRight: 16,
+                    padding: 12,
+                    borderRadius: 12,
+                    backgroundColor: Colors.offWhite,
+                  }}
+                >
+                  <Text style={{ color: Colors.blue }}>Extras</Text>
+                </View>
+              </>
+            </Animated.ScrollView>
+          </View>
 
           <DisplayedItems />
         </View>
@@ -180,5 +210,5 @@ const styles = StyleSheet.create({
     height: "100%",
     width: "100%",
   },
-  categoryList: {},
+  categoryList: { backgroundColor: Colors.yellow },
 });
