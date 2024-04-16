@@ -11,7 +11,7 @@ import Animated, { AnimatedStyle } from "react-native-reanimated";
 import { Colors } from "theme/colors";
 
 interface HeaderProps {
-  mainTitle?: string;
+  mainTitle: string;
   showTitleAnimatedStyle?: AnimatedStyle<TextStyle>;
   showBackgroundAnimatedStyle?: AnimatedStyle<ViewStyle>;
 }

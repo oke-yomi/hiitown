@@ -1,26 +1,18 @@
 import { ICategory, Meal, MealsData, categories } from "data/mealData";
-import { LinearGradient } from "expo-linear-gradient";
 import React, { useState } from "react";
-import {
-  ImageBackground,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import Animated, {
   Extrapolation,
   interpolate,
-  interpolateColor,
   useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
 import { Colors } from "theme/colors";
 
+import BackgroundImage from "./BackgroundImage";
 import CategoriesComponent from "./CategoriesComponent";
 import Details from "./Details";
-import Header from "./Header";
 import MealCard from "./MealCard";
 
 const mainTitle = "The Food Cafe";
@@ -49,31 +41,6 @@ const Home = () => {
     return { transform: [{ translateY }] };
   });
 
-  const headerStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(
-      scrollY.value,
-      [0, 320],
-      [0, 1],
-      Extrapolation.CLAMP,
-    );
-
-    return {
-      opacity,
-    };
-  });
-
-  const backgroundStyle = useAnimatedStyle(() => {
-    const backgroundColor = interpolateColor(
-      scrollY.value,
-      [0, 250],
-      ["transparent", Colors.primary],
-    );
-
-    return {
-      backgroundColor,
-    };
-  });
-
   const stickyTop = useAnimatedStyle(() => {
     const top = interpolate(
       scrollY.value,
@@ -94,41 +61,17 @@ const Home = () => {
     };
   });
 
-  const animatedImageStyles = useAnimatedStyle(() => {
-    const scale = interpolate(scrollY.value, [0, 320], [1.3, 1], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    });
-
-    return { transform: [{ scale }] };
-  });
-
   const filteredMeals = selectedCategory
     ? MealsData.filter((meal) => meal.category.includes(selectedCategory))
     : [];
 
   return (
     <View>
-      <>
-        <Header
-          mainTitle={mainTitle}
-          showTitleAnimatedStyle={headerStyle}
-          showBackgroundAnimatedStyle={backgroundStyle}
-        />
-
-        <Animated.View style={[styles.image, animatedImageStyles]}>
-          <ImageBackground
-            source={require("../assets/images/background.png")}
-            resizeMode="contain"
-            style={styles.image}
-          />
-
-          <LinearGradient
-            colors={["transparent", "transparent", "#242021"]}
-            style={styles.linearGradient}
-          />
-        </Animated.View>
-      </>
+      <BackgroundImage
+        imageHeight={imageHeight}
+        mainTitle={mainTitle}
+        scrollY={scrollY}
+      />
 
       <Animated.View
         style={[scrollAnimatedStyle, { backgroundColor: Colors.primary }]}
@@ -174,14 +117,6 @@ const Home = () => {
 export default Home;
 
 const styles = StyleSheet.create({
-  image: {
-    height: imageHeight,
-    width: "100%",
-  },
-  linearGradient: {
-    height: imageHeight + 50,
-    ...StyleSheet.absoluteFillObject,
-  },
   horizontalScroll: {
     height: 150,
     backgroundColor: Colors.primary,
@@ -198,9 +133,9 @@ const styles = StyleSheet.create({
         elevation: 3,
       },
       ios: {
-        shadowColor: Colors.blue,
+        shadowColor: Colors.gray,
         shadowOpacity: 0.7,
-        shadowRadius: 10,
+        shadowRadius: 7,
         shadowOffset: {
           width: 4,
           height: 3,

@@ -1,9 +1,8 @@
 // eslint-disable-next-line import/order
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-
 import Home from "components/Home";
 import React from "react";
 import { StatusBar, StyleSheet } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Colors } from "theme/colors";
 
 export default function App() {
