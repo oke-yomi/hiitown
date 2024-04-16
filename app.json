@@ -15,7 +15,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.okeoluwayomi.hiitown"
     },
     "android": {
       "adaptiveIcon": {
@@ -29,7 +30,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "16bab26c-22ba-494b-b2b5-47e0b1b5bd24"
+        "projectId": "01ad8266-8b90-41c4-ac95-df75e0ec9b2f"
       }
     }
   }

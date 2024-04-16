@@ -1,6 +1,21 @@
 # Hiitown
 
-- [Android Demo Link](https://expo.dev/accounts/okeoluwayomi/projects/hiitown/builds/30efd323-1079-4a1d-8f8b-32dd96b755f3)
+- [Android Demo Link](https://expo.dev/accounts/yomifavour/projects/hiitown/builds/c8334518-919b-4ef7-bbaa-d3c9b7fbd665)
+Download the APK to install on your android device
+
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npx expo start
+# For Android
+npx expo start --android
+# For ios
+npx expo start --ios
+```
+scan the QR code to get the expo app running
 
 ### Project Brief
 
@@ -49,15 +64,3 @@
 - [Expo CLI](https://docs.expo.dev/)
 - [React Native Reanimated](https://docs.swmansion.com/react-native-reanimated/)
 
-## Getting Started
-
-First, run the development server:
-
-```bash
-npx expo start
-# For Android
-npx expo start --android
-# For ios
-npx expo start --ios
-```
-scan the QR code to get the expo app running
