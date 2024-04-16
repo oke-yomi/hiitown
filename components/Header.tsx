@@ -11,9 +11,9 @@ import Animated, { AnimatedStyle } from "react-native-reanimated";
 import { Colors } from "theme/colors";
 
 interface HeaderProps {
-  mainTitle: string;
-  showTitleAnimatedStyle: AnimatedStyle<TextStyle>;
-  showBackgroundAnimatedStyle: AnimatedStyle<ViewStyle>;
+  mainTitle?: string;
+  showTitleAnimatedStyle?: AnimatedStyle<TextStyle>;
+  showBackgroundAnimatedStyle?: AnimatedStyle<ViewStyle>;
 }
 
 const Header = ({
@@ -73,8 +73,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerTitle: {
-    color: Colors.yellow,
-    fontSize: 18,
+    color: Colors.white,
+    fontSize: 24,
     flex: 1,
     fontWeight: "600",
     textAlign: "center",

@@ -1,14 +1,17 @@
-import React, { useRef, useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
 import {
-  FlatList,
   ImageBackground,
+  Platform,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import Animated, {
+  Extrapolation,
   interpolate,
   interpolateColor,
+  useAnimatedScrollHandler,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
@@ -20,16 +23,35 @@ import Header from "./Header";
 import { DATA } from "./data";
 
 const mainTitle = "The Food Cafe";
+const imageHeight = 321;
 
 const Home = () => {
   const scrollY = useSharedValue(0);
-  const isSticky = useSharedValue(false);
+
+  const scrollHandler = useAnimatedScrollHandler({
+    onScroll: (event) => {
+      scrollY.value = event.contentOffset.y;
+    },
+  });
+
+  const scrollAnimatedStyle = useAnimatedStyle(() => {
+    const translateY = interpolate(
+      scrollY.value,
+      [0, 320],
+      [0, -imageHeight],
+      Extrapolation.CLAMP,
+    );
+
+    return { transform: [{ translateY }] };
+  });
 
   const headerStyle = useAnimatedStyle(() => {
-    const opacity = interpolate(scrollY.value, [0, 250], [0, 1], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    });
+    const opacity = interpolate(
+      scrollY.value,
+      [0, 320],
+      [0, 1],
+      Extrapolation.CLAMP,
+    );
 
     return {
       opacity,
@@ -48,82 +70,117 @@ const Home = () => {
     };
   });
 
-  const popularRef = useRef<View>(null);
-  const stickyRef = useRef(false);
+  const stickyTop = useAnimatedStyle(() => {
+    const top = interpolate(
+      scrollY.value,
+      [imageHeight - 140, imageHeight + 50],
+      [-140, 0],
+      Extrapolation.CLAMP,
+    );
+    const opacity = interpolate(
+      scrollY.value,
+      [imageHeight - 140, imageHeight + 50],
+      [0, 1],
+      Extrapolation.CLAMP,
+    );
 
-  console.log(stickyRef);
+    return {
+      top,
+      opacity,
+    };
+  });
 
-  const stickyStyle = useAnimatedStyle(() => ({
-    // position: isSticky.value === true ? "absolute" : "relative",
-    // top: isSticky.value === true ? 0 : undefined,
-    backgroundColor: stickyRef.current ? "red" : "blue",
-  }));
+  const animatedImageStyles = useAnimatedStyle(() => {
+    const scale = interpolate(scrollY.value, [0, 320], [1.3, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+
+    return { transform: [{ scale }] };
+  });
 
   return (
-    <>
-      <Header
-        mainTitle={mainTitle}
-        showTitleAnimatedStyle={headerStyle}
-        showBackgroundAnimatedStyle={backgroundStyle}
-      />
+    <View>
+      <>
+        <Header
+          mainTitle={mainTitle}
+          showTitleAnimatedStyle={headerStyle}
+          showBackgroundAnimatedStyle={backgroundStyle}
+        />
 
-      <FlatList
-        data={DATA}
-        keyExtractor={(item) => item.title}
-        renderItem={({ item }) => (
-          <Animated.View
-            style={[
-              { backgroundColor: stickyRef.current ? "red" : "blue" },
-              stickyStyle,
-            ]}
-          >
-            {item.data.map((it, index) => (
-              <Text key={index} style={{ color: "white" }}>
-                {it}
-              </Text>
-            ))}
-          </Animated.View>
-        )}
-        ListHeaderComponent={() => (
-          <>
-            <ImageBackground
-              source={require("../assets/images/background.png")}
-              resizeMode="cover"
-              style={styles.image}
-            >
-              <View style={styles.bgOverlay} />
-            </ImageBackground>
-            <Details mainTitle={mainTitle} />
+        <Animated.View style={[styles.image, animatedImageStyles]}>
+          <ImageBackground
+            source={require("../assets/images/background.png")}
+            resizeMode="contain"
+            style={styles.image}
+          />
 
-            <Animated.View
-              ref={popularRef}
-              style={[
-                {
-                  marginRight: 16,
-                  padding: 12,
-                  borderRadius: 12,
-                  backgroundColor: Colors.offWhite,
-                  // position: isSticky.value ? "absolute" : "relative",
-                  // top: 90,
-                },
-              ]}
-            >
-              <Text style={{ color: Colors.blue }}>Popular</Text>
+          <LinearGradient
+            colors={["transparent", "transparent", "#ab335b"]}
+            style={styles.linearGradient}
+          />
+        </Animated.View>
+      </>
+
+      <Animated.View
+        style={[scrollAnimatedStyle, { backgroundColor: Colors.primary }]}
+      >
+        <Animated.FlatList
+          data={DATA}
+          keyExtractor={(item) => item.title}
+          renderItem={({ item }) => (
+            <Animated.View style={[{ backgroundColor: "red" }]}>
+              {item.data.map((it: any, index: any) => (
+                <Text key={index} style={{ color: "white" }}>
+                  {it}
+                </Text>
+              ))}
             </Animated.View>
-          </>
-        )}
-        ListFooterComponent={DisplayedItems}
-        onScroll={({ nativeEvent }) => {
-          scrollY.value = nativeEvent.contentOffset.y;
+          )}
+          ListHeaderComponent={() => (
+            <>
+              <Details mainTitle={mainTitle} />
 
-          popularRef.current?.measure((x, y, width, height, pageX, pageY) => {
-            isSticky.value = pageY <= 90;
-            // stickyRef.current = pageY <= 90;
-          });
-        }}
-        scrollEventThrottle={16}
-      />
-    </>
+              <Animated.View
+                style={[
+                  {
+                    marginRight: 16,
+                    padding: 12,
+                    borderRadius: 12,
+                    backgroundColor: Colors.offWhite,
+                  },
+                ]}
+              >
+                <Text style={{ color: Colors.blue }}>Popularly</Text>
+              </Animated.View>
+            </>
+          )}
+          ListFooterComponent={() => (
+            <>
+              <DisplayedItems />
+            </>
+          )}
+          onScroll={scrollHandler}
+          scrollEventThrottle={16}
+          contentContainerStyle={{ paddingBottom: 500, marginBottom: 500 }}
+        />
+      </Animated.View>
+
+      <Animated.View style={[styles.horizontalScroll, stickyTop]}>
+        <View
+          style={[
+            {
+              marginRight: 16,
+              padding: 12,
+              borderRadius: 12,
+              backgroundColor: Colors.offWhite,
+            },
+          ]}
+        >
+          <Text style={{ color: Colors.blue }}>Popular</Text>
+        </View>
+      </Animated.View>
+    </View>
   );
 };
 
@@ -131,16 +188,36 @@ export default Home;
 
 const styles = StyleSheet.create({
   image: {
-    height: 321,
+    height: imageHeight,
     width: "100%",
   },
-  bgOverlay: {
-    backgroundColor: "rgba(0,0,0,0.5)",
+  linearGradient: {
+    height: imageHeight + 50,
+    ...StyleSheet.absoluteFillObject,
+  },
+  horizontalScroll: {
+    height: 140,
+    backgroundColor: Colors.primary,
     position: "absolute",
-    top: 0,
+    top: -140,
+    right: 0,
     left: 0,
-    height: "100%",
+    opacity: 0,
     width: "100%",
+    justifyContent: "flex-end",
+    ...Platform.select({
+      android: {
+        elevation: 3,
+      },
+      ios: {
+        shadowColor: "pink",
+        shadowOpacity: 1,
+        shadowRadius: 16,
+        shadowOffset: {
+          width: 4,
+          height: 3,
+        },
+      },
+    }),
   },
-  categoryList: { backgroundColor: Colors.yellow },
 });
