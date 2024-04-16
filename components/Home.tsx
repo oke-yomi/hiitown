@@ -77,14 +77,14 @@ const Home = () => {
   const stickyTop = useAnimatedStyle(() => {
     const top = interpolate(
       scrollY.value,
-      [imageHeight - 150, imageHeight + 50],
-      [-150, 0],
+      [imageHeight - 150, imageHeight + 50, 1800, 2300],
+      [-150, 0, 0, -150],
       Extrapolation.CLAMP,
     );
     const opacity = interpolate(
       scrollY.value,
-      [imageHeight - 150, imageHeight + 50],
-      [0, 1],
+      [imageHeight - 150, imageHeight + 50, 1800, 2300],
+      [0, 1, 1, 0],
       Extrapolation.CLAMP,
     );
 
