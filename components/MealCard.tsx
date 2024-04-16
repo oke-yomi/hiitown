@@ -26,7 +26,7 @@ const MealCard = ({ item }: Props) => {
         </View>
 
         <View style={styles.detailsWrapper}>
-          <View style={{ maxWidth: 116 }}>
+          <View style={{ maxWidth: 116, flexShrink: 1 }}>
             <Text style={styles.meal}>{item.meal}</Text>
             <Text style={styles.subTitle}>Spicy</Text>
             <Text style={styles.price}>${item.price}</Text>
